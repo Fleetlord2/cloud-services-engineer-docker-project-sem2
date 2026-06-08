@@ -21,15 +21,27 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
+RUN addgroup -S nginxgroup && adduser -S nginxuser -G nginxgroup
+
 RUN printf 'server { \
     listen 80; \
     server_name _; \
+    location = /momo-store { \
+        return 301 /momo-store/; \
+    } \
     location /momo-store/ { \
         alias /usr/share/nginx/html/; \
         try_files $uri $uri/ /index.html; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
+RUN chown -R nginxuser:nginxgroup /usr/share/nginx/html
+
+USER nginxuser
+
 EXPOSE 80
+
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget --spider http://localhost/momo-store/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

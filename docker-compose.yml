@@ -2,14 +2,28 @@ version: "3.9"
 
 services:
   backend:
+    image: ${DOCKER_USER}/docker-project-backend:latest
     build:
       context: ./backend
     container_name: momo-backend
     ports:
       - "8080:8081"
     restart: always
+    networks:
+      - momo-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
 
   frontend:
+    image: ${DOCKER_USER}/docker-project-frontend:latest
     build:
       context: ./frontend
       args:
@@ -18,5 +32,22 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     restart: always
+    networks:
+      - momo-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost/momo-store/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+networks:
+  momo-network:
+    driver: bridge
