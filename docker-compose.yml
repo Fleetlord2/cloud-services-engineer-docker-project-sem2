@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   backend:
-    image: ${DOCKER_USER}/docker-project-backend:latest
+    image: ${secrets.DOCKER_USER}/docker-project-backend:latest
     build:
       context: ./backend
     container_name: momo-backend
@@ -23,7 +23,7 @@ services:
           memory: 256M
 
   frontend:
-    image: ${DOCKER_USER}/docker-project-frontend:latest
+    image: ${secrets.DOCKER_USER}/docker-project-frontend:latest
     build:
       context: ./frontend
       args:
