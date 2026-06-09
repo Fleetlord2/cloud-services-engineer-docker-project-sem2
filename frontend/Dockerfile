@@ -15,7 +15,7 @@ RUN npm run build
 
 
 # ---------- Stage 2: Runtime ----------
-FROM nginx:1.27-alpine
+FROM nginx:stable-alpine3.23-slim
 
 RUN rm /etc/nginx/conf.d/default.conf
 
